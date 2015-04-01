@@ -1,0 +1,26 @@
+%html
+  %head
+    %script{:src => "https://www.google.com/jsapi", :type => "text/javascript"}
+    :javascript
+      google.load("visualization", "1", {packages:["timeline"]});
+      google.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var container = document.getElementById('timeline');
+        var chart = new google.visualization.Timeline(container);
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn({ type: 'string', id: 'Request' });
+        dataTable.addColumn({ type: 'number', id: 'Start' });
+        dataTable.addColumn({ type: 'number', id: 'End' });
+        console.log(#{@data});
+        dataTable.addRows(#{@data});
+
+        chart.draw(dataTable);
+
+        var options = {
+        };
+      }
+%body
+  %p Performance Timeline
+  #timeline{:style => "width: 900px; height: 390px;"}
