@@ -2,7 +2,7 @@ Sample output with Google Chart timeline:
 ![SOA_Tracer_Timeline](https://github.com/joychester/soa_tracer_poc/blob/master/gchart_timing.png)
 
 DB schema:  
-ID| URL_Name | Type | GUID | ServiceID | TS
+ID| URL_Name | Type | PageID | ServiceID | TS
 
 Sample Records:  
 "/page/pageA|2d52bc55b4b986aa1dfd||0|1427190743.714614|"
