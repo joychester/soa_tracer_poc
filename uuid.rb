@@ -92,10 +92,18 @@ end
 
 get '/report/:uuid' do 
     @data = []
-    #@data =  Logs.getlog(params[:uuid])
-    @data =  Logs.getstack(params[:uuid])
+    p @data =  Logs.getstack(params[:uuid])
 
     haml :timeline_chart
+end
+
+get '/d3/:uuid' do 
+    @json_tree = Logs.gettree(params[:uuid])
+end
+
+get '/d3/treeview/:uuid' do
+    @uuid = params[:uuid]
+    haml :d3_treeview
 end
 
 
