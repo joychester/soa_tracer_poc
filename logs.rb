@@ -17,7 +17,7 @@ class Logs < Sequel::Model(:logs)
             	base = 0
             	# SELECT * FROM logs WHERE (pageid = 'a730e0683057c8abbe79')
             	item_len = Logs.where(:pageid => uuid).count
-            	row_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00')")
+            	row_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00') order by id")
             	start_id = row_id.get(:id)
             	call_depth = row_id.count
 
@@ -25,9 +25,9 @@ class Logs < Sequel::Model(:logs)
             		call_depth.times do
             			temp_a = []
             			
-            			name = Logs.with_sql("select url_name from logs where pageid = '#{uuid}' and id >= #{start_id} and (type = '0' or type = '00')").get(:url_name)
-            			start_ts = Logs.with_sql("select ts from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '0' or type = '00')").get(:ts)
-            			end_ts = Logs.with_sql("select ts from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '1' or type = '11')").get(:ts)
+            			name = Logs.with_sql("select url_name from logs where pageid = '#{uuid}' and id >= #{start_id} and (type = '0' or type = '00') order by id").get(:url_name)
+            			start_ts = Logs.with_sql("select ts from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '0' or type = '00') order by id").get(:ts)
+            			end_ts = Logs.with_sql("select ts from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '1' or type = '11') order by id").get(:ts)
 
             			#convert to ms
             			start_ts = (start_ts * 1000).to_i
@@ -40,7 +40,7 @@ class Logs < Sequel::Model(:logs)
             			temp_a = [name,(start_ts-base),(end_ts-base)]
             			array_a << temp_a
 
-            			current_entry_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '0' or type = '00')").get(:id)
+            			current_entry_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and url_name = '#{name}' and (type = '0' or type = '00') order by id").get(:id)
             			start_id = current_entry_id + 1
             		end
             	else
@@ -53,9 +53,9 @@ class Logs < Sequel::Model(:logs)
 
             #this is a json formatted tree
             def Logs.gettree(uuid)
-                  node_num = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00')").count
+                  node_num = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00') order by id").count
 
-                  start_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00')").get(:id)
+                  start_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and (type = '0' or type = '00') order by id").get(:id)
 
                   #Create the root node first
                   root_name = Logs.with_sql("select url_name from logs where id = #{start_id}").get(:url_name)
@@ -70,8 +70,8 @@ class Logs < Sequel::Model(:logs)
                   #build a tree with root node
                   (node_num-1).times do
                         #get next node service id
-                        node_name = Logs.with_sql("select url_name from logs where pageid = '#{uuid}' and id >= #{start_id} and (type = '0' or type = '00')").get(:url_name)
-                        node_serviceid = Logs.with_sql("select serviceid from logs where pageid = '#{uuid}' and url_name = '#{node_name}' and (type = '0' or type = '00')").get(:serviceid)
+                        node_name = Logs.with_sql("select url_name from logs where pageid = '#{uuid}' and id >= #{start_id} and (type = '0' or type = '00') order by id").get(:url_name)
+                        node_serviceid = Logs.with_sql("select serviceid from logs where pageid = '#{uuid}' and url_name = '#{node_name}' and (type = '0' or type = '00') order by id").get(:serviceid)
 
                         depth_diff = node_serviceid.length - serviceid_arr.last.length
 
@@ -90,7 +90,7 @@ class Logs < Sequel::Model(:logs)
                         serviceid_arr.push(node_serviceid)
 
                         #move to next id
-                        current_entry_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and url_name = '#{node_name}' and (type = '0' or type = '00')").get(:id)
+                        current_entry_id = Logs.with_sql("select id from logs where pageid = '#{uuid}' and url_name = '#{node_name}' and (type = '0' or type = '00') order by id").get(:id)
                         start_id = current_entry_id + 1
 
                   end
